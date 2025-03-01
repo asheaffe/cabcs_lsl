@@ -21,7 +21,7 @@ This application can be built following general
 After cloning, run the following code on the command line (in a Ubuntu virtual environment):
 
 ```
-cmake -S . -B build -DCMAKE_PREFIX_PATH="/mnt/c/Users/annsb/Documents/HCI-Lab/cabcs_lsl/5.15.2/msvc2019_64/lib/cmake/Qt5"
+cmake -S . -B build -DCMAKE_PREFIX_PATH="/mnt/c/path/to/repo/cabcs_lsl/5.15.2/msvc2019_64/lib/cmake/Qt5"
 ```
 
 # License
