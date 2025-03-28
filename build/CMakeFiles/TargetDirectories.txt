@@ -1,0 +1,10 @@
+/mnt/c/Users/HCI/Documents/cabcs_lsl/build/CMakeFiles/AppTemplate_cpp_qt.dir
+/mnt/c/Users/HCI/Documents/cabcs_lsl/build/CMakeFiles/package.dir
+/mnt/c/Users/HCI/Documents/cabcs_lsl/build/CMakeFiles/package_source.dir
+/mnt/c/Users/HCI/Documents/cabcs_lsl/build/CMakeFiles/edit_cache.dir
+/mnt/c/Users/HCI/Documents/cabcs_lsl/build/CMakeFiles/rebuild_cache.dir
+/mnt/c/Users/HCI/Documents/cabcs_lsl/build/CMakeFiles/list_install_components.dir
+/mnt/c/Users/HCI/Documents/cabcs_lsl/build/CMakeFiles/install.dir
+/mnt/c/Users/HCI/Documents/cabcs_lsl/build/CMakeFiles/install/local.dir
+/mnt/c/Users/HCI/Documents/cabcs_lsl/build/CMakeFiles/install/strip.dir
+/mnt/c/Users/HCI/Documents/cabcs_lsl/build/CMakeFiles/AppTemplate_cpp_qt_autogen.dir
