@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 """
+
 ReceiveAndPlot example for LSL
+Original code taken from ReceiveAndPlot example for LSL
+https://github.com/labstreaminglayer/pylsl
 
 This example shows data from all found outlets in realtime.
 It illustrates the following use cases:
