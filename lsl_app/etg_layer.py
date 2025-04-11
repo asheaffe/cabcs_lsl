@@ -65,7 +65,7 @@ class SMI_ETG:
             print(f"Error creating LSL outlet: {e}")
             sys.exit(1)
 
-    def on_gaze_data(self, data):
+    def on_gaze_data(self):
         """Collect data to push to stream"""
         try:
             # https://github.com/chkothe/pylsl/blob/master/examples/SendDataAdvanced.py
@@ -85,6 +85,7 @@ if __name__ == "__main__":
     print("Streaming eye tracking data to LSL. Press Ctrl+C to stop...")
     try:
         while True:
+            etg_lsl.on_gaze_data()
             time.sleep(1)
             
     except KeyboardInterrupt:
