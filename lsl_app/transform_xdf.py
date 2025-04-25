@@ -1,11 +1,18 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import sys
+import os
+import re
+
+# this is important for lab computer
+site_packages = r'C:\Users\HCI\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.7_qbz5n2kfra8p0\LocalCache\local-packages\Python37\site-packages'
+sys.path.append(site_packages)
 
 import pyxdf
 import mne
 
 # TODO: This only reads in one file at a time. Is there a way to read in multiple .xdf files at once?
-data, header = pyxdf.load_xdf("lsl_app/test.xdf")
+data, header = pyxdf.load_xdf("dummy_data/dummy1.xdf")
 
 def PlotGraph(data):
     for stream in data:
@@ -68,7 +75,7 @@ def ConvertfNIRS(data):
     fnirs_stream = FindStream(data, 'nirs')
     
     if fnirs_stream is not None:
-        data = eeg_stream["time_series"].T
+        data = fnirs_stream["time_series"].T
     else:
         print("fNIRS stream data not found")
         return None
@@ -80,18 +87,60 @@ def ConvertfNIRS(data):
 
     channel_num = time_series.shape[0]
     cnames = [f"S-D{i//2+1}_{['hbo', 'hbr'][i%2]}" for i in range(channel_num)]
-    ctypes = ["nirs"] * channel_num
+    ctypes = ["fnirs_fd_phase"] * channel_num
 
     # mne info object
     info = mne.create_info(cnames, sfreq, ctypes)
 
     raw = mne.io.RawArray(time_series, info)
 
+    #snirf = mne.io.read_raw_snirf()
+
     return raw
+
+def create_file(folder_path):
+    """Creates a new file to write data to
+
+    device: type of device used to measure (i.e. eeg, fnirs, etc.)"""
+    files = os.listdir(folder_path)   # change this with real data
+    prefix = "data_"
+
+    pattern = re.compile(f"^{prefix}(\\d+).*$")
+    matching_files = [f for f in files if pattern.match(f)]
+
+    # Find the highest number
+    max_num = 0
+    for file in matching_files:
+        match = pattern.match(file)
+        if match:
+            num = int(match.group(1))
+            max_num = max(max_num, num)
+    
+    # Create the new file name with incremented number
+    new_num = max_num + 1
+    new_filename = f"{prefix}{str(new_num)}"
+    new_filepath = os.path.join(folder_path, new_filename)
+
+    with open(new_filepath, 'w') as file:
+        file.write(f"{new_filename} created!")
+    
+    print(f"{new_filename} created!")
+
+    return new_filepath
+
+def write_data(filepath, data):
+    with open(filepath, 'w') as file:
+        for line in data:
+            file.write(f"{line[0]}\t{line[1]}")
+
+    print("data written to ", filepath)
 
 def main():
     ConvertEEG(data)
-    ConvertfNIRS(data) 
+    fnirs_data = ConvertfNIRS(data) 
+    #create_file("dummy_data")
+    filepath = os.path.join("dummy_data", "data_1")
+    write_data(filepath, fnirs_data)
     #print(FindStream(data, 'eeg'))
 
 if __name__ == "__main__":
