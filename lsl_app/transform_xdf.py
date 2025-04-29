@@ -11,12 +11,10 @@ sys.path.append(site_packages)
 
 import pyxdf
 import mne
-import mne_nirs
-from mne_nirs.io import write_raw_snirf
-#from mne_nirs.preprocessing import beer_lambert_law    # for raw amplitude data
 
+FILEPATH = "dummy_data/dummy1.xdf"
 # TODO: This only reads in one file at a time. Is there a way to read in multiple .xdf files at once?
-data, header = pyxdf.load_xdf("dummy_data/dummy1.xdf")
+data, header = pyxdf.load_xdf(FILEPATH)
 
 def PlotGraph(data):
     for stream in data:
@@ -42,38 +40,55 @@ def FindStream(data, stream_type):
     stream_type: type of stream ('nirs', 'eeg', etc.) as used in LabRecorder
     """
     for i, stream in enumerate(data):
-        #print("STREAM TYPE: ", stream['info']['type'][0].lower())
+        print("STREAM TYPE: ", stream['info']['type'][0].lower())
         if stream_type in stream['info']['type'][0].lower():
             # return the stream if it exists
             return data[i]
     # else, return None
     return None
 
-def ConvertEEG(data):
+def ConvertEEG(data, pid):
     # find EEG stream
     eeg_stream = FindStream(data, 'eeg')
     
     if eeg_stream is not None:
-        data = eeg_stream["time_series"].T
+        data = eeg_stream["time_series"]
     else:
         print("EEG stream data not found")
         return None
     
+    channel_num = int(eeg_stream['info']['channel_count'][0])
+    #print(len(data), ", ", len(eeg_stream["time_series"]))
+
     # sampling frequency
     sfreq = float(eeg_stream["info"]["nominal_srate"][0])
 
-    cnames = [f"EEG{i+1}" for i in range(data.shape[0])]
-    ctypes = ["eeg"] * data.shape[0]
+    cnames = [f"EEG{i+1}" for i in range(channel_num)]
+    ctypes = ["eeg"] * channel_num
 
     # mne info object
     info = mne.create_info(cnames, sfreq, ctypes)
-
+    
     # raw object
     raw = mne.io.RawArray(data, info)
 
+    # only save if there is data
+    if raw.n_times > 0:
+        # create a filepath for .fif file
+        directory = FILEPATH.split("/")[0]
+        filepath = f"{directory}/eeg/{pid}_eeg.fif"
+        
+        # save as a .fif file
+        raw.save(filepath, overwrite=True)
+
+        print(f"Saved EEG data to {filepath}!")
+    
+    else:
+        print("Cannot save Raw object with zero time points.")
+
     return raw
 
-def ConvertfNIRS(data):
+def ConvertfNIRS(data, pid):
     # find fNIRS stream if index isn't provided
     fnirs_stream = FindStream(data, 'nirs')
     
@@ -92,37 +107,14 @@ def ConvertfNIRS(data):
     # mne info object
     info = mne.create_info(cnames, sfreq, ctypes)
 
-    # get date from LabRecorder file, required for SNIRF format
-    if 'created_at' in fnirs_stream['info']:
-        timestamp = fnirs_stream['info']['created_at'][0]
-        curr_time = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
-        try:
-            # XDF uses ISO format timestamps
-            session_time = curr_time - timedelta(seconds=float(timestamp))
-            info.set_meas_date(session_time)
-        except (ValueError, TypeError):
-            # otherwise just use current date/time just in case
-            info.set_meas_date(curr_time)
-            print("ALERT: Could not parse timestamp from stream info, using current time")
-
-    # get participant info from LabRecorder file, required for SNIRF
-    subject_info = {
-        'id': fnirs_stream['info']['session_id'][0], 
-        'first_name': '', 
-        'last_name': '', 
-        'birthday': None,
-        'sex': 0,
-        'hand': 0    
-    }
-
-    print(fnirs_stream['info'])
-
-    info['subject_info'] = subject_info
-
     raw = mne.io.RawArray(data, info)
-    #raw = beer_lambert_law(raw)     # might not need to do this? for optical density
-
-    #write_raw_snirf(raw, "dummy_data/data_1.snirf", True)
+    
+    # create a filepath for .fif file
+    directory = FILEPATH.split("/")[0]
+    filepath = f"{directory}/fnirs/{pid}_fnirs.fif"
+    
+    # save as a .fif file
+    raw.save(filepath, overwrite=True)
 
     return raw
 
@@ -155,8 +147,8 @@ def create_file(folder_path):
             max_num = max(max_num, num)
     
     # Create the new file name with incremented number
-    new_num = max_num + 1
-    new_filename = f"{prefix}{str(new_num)}"
+    pid = max_num + 1
+    new_filename = f"{prefix}{str(pid)}"
     new_filepath = os.path.join(folder_path, new_filename)
 
     with open(new_filepath, 'w') as file:
@@ -164,7 +156,8 @@ def create_file(folder_path):
     
     print(f"{new_filename} created!")
 
-    return new_filepath
+    # return the participant id to be used later
+    return pid
 
 def write_data(filepath, data):
     with open(filepath, 'w') as file:
@@ -174,13 +167,10 @@ def write_data(filepath, data):
     print("data written to ", filepath)
 
 def main():
-    ConvertEEG(data)
-    fnirs_data = ConvertfNIRS(data) 
-    see_data(fnirs_data)
-    #create_file("dummy_data")
-    # filepath = os.path.join("dummy_data", "data_1")
-    # write_data(filepath, fnirs_data)
-    #print(FindStream(data, 'eeg'))
+    #ConvertEEG(data)
+    pid = create_file("dummy_data")
+    fnirs_data = ConvertfNIRS(data, 1) 
+    eeg_data = ConvertEEG(data, 1)
 
 if __name__ == "__main__":
     main()
