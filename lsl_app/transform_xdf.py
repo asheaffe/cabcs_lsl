@@ -3,6 +3,7 @@ import numpy as np
 import sys
 import os
 import re
+from datetime import datetime, timezone, timedelta
 
 # this is important for lab computer
 site_packages = r'C:\Users\HCI\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.7_qbz5n2kfra8p0\LocalCache\local-packages\Python37\site-packages'
@@ -10,6 +11,9 @@ sys.path.append(site_packages)
 
 import pyxdf
 import mne
+import mne_nirs
+from mne_nirs.io import write_raw_snirf
+#from mne_nirs.preprocessing import beer_lambert_law    # for raw amplitude data
 
 # TODO: This only reads in one file at a time. Is there a way to read in multiple .xdf files at once?
 data, header = pyxdf.load_xdf("dummy_data/dummy1.xdf")
@@ -38,7 +42,7 @@ def FindStream(data, stream_type):
     stream_type: type of stream ('nirs', 'eeg', etc.) as used in LabRecorder
     """
     for i, stream in enumerate(data):
-        print("STREAM TYPE: ", stream['info']['type'][0].lower())
+        #print("STREAM TYPE: ", stream['info']['type'][0].lower())
         if stream_type in stream['info']['type'][0].lower():
             # return the stream if it exists
             return data[i]
@@ -71,7 +75,6 @@ def ConvertEEG(data):
 
 def ConvertfNIRS(data):
     # find fNIRS stream if index isn't provided
-    # TODO: check that 'nirs' is the right type keyword
     fnirs_stream = FindStream(data, 'nirs')
     
     if fnirs_stream is not None:
@@ -80,23 +83,58 @@ def ConvertfNIRS(data):
         print("fNIRS stream data not found")
         return None
 
-    # extract data
-    time_series = fnirs_stream['time_series']
-
     sfreq = float(fnirs_stream['info']['nominal_srate'][0])
 
-    channel_num = time_series.shape[0]
+    channel_num = data.shape[0]
     cnames = [f"S-D{i//2+1}_{['hbo', 'hbr'][i%2]}" for i in range(channel_num)]
-    ctypes = ["fnirs_fd_phase"] * channel_num
+    ctypes = ["fnirs_cw_amplitude"] * channel_num
 
     # mne info object
     info = mne.create_info(cnames, sfreq, ctypes)
 
-    raw = mne.io.RawArray(time_series, info)
+    # get date from LabRecorder file, required for SNIRF format
+    if 'created_at' in fnirs_stream['info']:
+        timestamp = fnirs_stream['info']['created_at'][0]
+        curr_time = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
+        try:
+            # XDF uses ISO format timestamps
+            session_time = curr_time - timedelta(seconds=float(timestamp))
+            info.set_meas_date(session_time)
+        except (ValueError, TypeError):
+            # otherwise just use current date/time just in case
+            info.set_meas_date(curr_time)
+            print("ALERT: Could not parse timestamp from stream info, using current time")
 
-    #snirf = mne.io.read_raw_snirf()
+    # get participant info from LabRecorder file, required for SNIRF
+    subject_info = {
+        'id': fnirs_stream['info']['session_id'][0], 
+        'first_name': '', 
+        'last_name': '', 
+        'birthday': None,
+        'sex': 0,
+        'hand': 0    
+    }
+
+    print(fnirs_stream['info'])
+
+    info['subject_info'] = subject_info
+
+    raw = mne.io.RawArray(data, info)
+    #raw = beer_lambert_law(raw)     # might not need to do this? for optical density
+
+    #write_raw_snirf(raw, "dummy_data/data_1.snirf", True)
 
     return raw
+
+def see_data(raw_data):
+    """Takes an MNE-Python Raw object and prints the important info for easier debugging"""
+    data, times = raw_data[:, :]
+
+    print(f"Time points: {times[:10]}...")
+    print(f"Data shape: {data.shape}")
+
+    # for i, ch_name in enumerate(raw_data.ch_names):
+    #     print(f"Channel {ch_name}: {data[i, :5]}...")
 
 def create_file(folder_path):
     """Creates a new file to write data to
@@ -138,9 +176,10 @@ def write_data(filepath, data):
 def main():
     ConvertEEG(data)
     fnirs_data = ConvertfNIRS(data) 
+    see_data(fnirs_data)
     #create_file("dummy_data")
-    filepath = os.path.join("dummy_data", "data_1")
-    write_data(filepath, fnirs_data)
+    # filepath = os.path.join("dummy_data", "data_1")
+    # write_data(filepath, fnirs_data)
     #print(FindStream(data, 'eeg'))
 
 if __name__ == "__main__":
