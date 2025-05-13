@@ -3,6 +3,7 @@ import numpy as np
 import sys
 import os
 import re
+import glob
 from datetime import datetime, timezone, timedelta
 
 # this is important for lab computer
@@ -12,9 +13,18 @@ sys.path.append(site_packages)
 import pyxdf
 import mne
 
-FILEPATH = "dummy_data/dummy1.xdf"
-# TODO: This only reads in one file at a time. Is there a way to read in multiple .xdf files at once?
-data, header = pyxdf.load_xdf(FILEPATH)
+FILEPATTERN = "dummy_data/*.xdf"
+ID_TO_STREAM = {}
+file_paths = glob.glob(FILEPATTERN)
+
+if not file_paths:
+    raise ValueError(f"No files matching pattern: {FILEPATTERN}")
+
+for i, path in enumerate(file_paths):
+    print(f"Loading file: {path}")
+    data, header = pyxdf.load_xdf(path)
+
+    ID_TO_STREAM[i] = (data, header)
 
 def PlotGraph(data):
     for stream in data:
@@ -40,19 +50,29 @@ def FindStream(data, stream_type):
     stream_type: type of stream ('nirs', 'eeg', etc.) as used in LabRecorder
     """
     for i, stream in enumerate(data):
-        print("STREAM TYPE: ", stream['info']['type'][0].lower())
+        #print("STREAM TYPE: ", stream['info']['type'][0].lower())
         if stream_type in stream['info']['type'][0].lower():
             # return the stream if it exists
             return data[i]
     # else, return None
     return None
 
-def ConvertEEG(data, pid):
+def ConvertEEG(data_dict, pid):
+    """Converts EEG data to a .fif file
+
+    :param data_dict: dictionary of data read in with pid
+    :param pid: id num of the data being read
+    :return: raw data
+    """
     # find EEG stream
-    eeg_stream = FindStream(data, 'eeg')
+    eeg_stream = FindStream(data_dict[pid][0], 'eeg')
     
     if eeg_stream is not None:
         data = eeg_stream["time_series"]
+
+        if len(data) == 0:
+            print("Warning: EEG time series is empty. No EEG file created.")
+            return None
     else:
         print("EEG stream data not found")
         return None
@@ -75,8 +95,12 @@ def ConvertEEG(data, pid):
     # only save if there is data
     if raw.n_times > 0:
         # create a filepath for .fif file
-        directory = FILEPATH.split("/")[0]
+        directory = FILEPATTERN.split("/")[0]
         filepath = f"{directory}/eeg/{pid}_eeg.fif"
+
+        if not os.path.exists(filepath):
+            os.makedirs(f"{directory}/eeg")
+            print("EEG directory created.")
         
         # save as a .fif file
         raw.save(filepath, overwrite=True)
@@ -88,9 +112,15 @@ def ConvertEEG(data, pid):
 
     return raw
 
-def ConvertfNIRS(data, pid):
+def ConvertfNIRS(data_dict, pid):
+    """Converts fNIRS data to a .fif file
+
+    :param data_dict: dictionary of data read in with pid
+    :param pid: id num for the data being read
+    :return: raw data
+    """
     # find fNIRS stream if index isn't provided
-    fnirs_stream = FindStream(data, 'nirs')
+    fnirs_stream = FindStream(data_dict[pid][0], 'nirs')
     
     if fnirs_stream is not None:
         data = fnirs_stream["time_series"].T
@@ -110,12 +140,16 @@ def ConvertfNIRS(data, pid):
     raw = mne.io.RawArray(data, info)
     
     # create a filepath for .fif file
-    directory = FILEPATH.split("/")[0]
-    filepath = f"{directory}/fnirs/{pid}_fnirs.fif"
+    directory = FILEPATTERN.split("/")[0]
+    filepath = f"{directory}/fnirs/{pid}_fnirs_raw.fif"
+
+    if not os.path.exists(directory):
+        os.makedirs(f"{directory}/fnirs")
+        print("fNIRS directory created.")
     
     # save as a .fif file
     raw.save(filepath, overwrite=True)
-
+    
     return raw
 
 def see_data(raw_data):
@@ -128,10 +162,10 @@ def see_data(raw_data):
     # for i, ch_name in enumerate(raw_data.ch_names):
     #     print(f"Channel {ch_name}: {data[i, :5]}...")
 
-def create_file(folder_path):
-    """Creates a new file to write data to
+def create_file(folder_path, data_dict):
+    """Creates a new file to write data to for each file read in
 
-    device: type of device used to measure (i.e. eeg, fnirs, etc.)"""
+    folder_path: directory to create a file in"""
     files = os.listdir(folder_path)   # change this with real data
     prefix = "data_"
 
@@ -146,18 +180,54 @@ def create_file(folder_path):
             num = int(match.group(1))
             max_num = max(max_num, num)
     
-    # Create the new file name with incremented number
-    pid = max_num + 1
-    new_filename = f"{prefix}{str(pid)}"
-    new_filepath = os.path.join(folder_path, new_filename)
+    # Create the new file name with incremented number for each file read in
+    for i in range(len(data_dict)):
+        pid = max_num + 1
+        new_filename = f"{prefix}{str(pid)}"
+        new_filepath = os.path.join(folder_path, new_filename)
 
-    with open(new_filepath, 'w') as file:
-        file.write(f"{new_filename} created!")
+        with open(new_filepath, 'w') as file:
+            file.write(f"{new_filename} created!")
+        
+        print(f"{new_filename} created!")
+
+        max_num += 1
+
+    # return the number of data files created
+    return len(data_dict)
+
+def clear_files(folder_path):
+    """Debugging function for clearing all data files during testing
     
-    print(f"{new_filename} created!")
+    :folder_path: str path to folder containing files to delete
+    :return: int number of files deleted, else None"""
 
-    # return the participant id to be used later
-    return pid
+    # first check if the file path exists
+    if not os.path.exists(folder_path):
+        print(f"Folder doesn't exist: {folder_path}")
+        return None
+    
+    # get all files in the folder
+    files = os.listdir(folder_path)   # change this with real data
+    prefix = "data_"
+
+    # regex matching files with "data_#"
+    pattern = re.compile(f"^{prefix}(\\d+).*$")
+    matching_files = [f for f in files if pattern.match(f)]
+
+    # delete each matching file
+    count = 0
+    for file in matching_files:
+        filepath = os.path.join(folder_path, file)
+        try:
+            # make sure it's a file
+            if os.path.isfile(filepath):
+                os.remove(filepath)
+                count += 1
+        except Exception as e:
+            print(f"Error deleting {filepath}: {e}")
+
+    return count
 
 def write_data(filepath, data):
     with open(filepath, 'w') as file:
@@ -166,11 +236,18 @@ def write_data(filepath, data):
 
     print("data written to ", filepath)
 
+# TODO: Other stream types [quality, markers, gaze] should have some kind of processing as well
+
 def main():
     #ConvertEEG(data)
-    pid = create_file("dummy_data")
-    fnirs_data = ConvertfNIRS(data, 1) 
-    eeg_data = ConvertEEG(data, 1)
+    num_files = create_file("dummy_data", ID_TO_STREAM)
+
+    for i in range(num_files):
+        ConvertEEG(ID_TO_STREAM, i)
+        ConvertfNIRS(ID_TO_STREAM, i)
+
+    #print(ID_TO_STREAM)
+    clear_files("dummy_data")
 
 if __name__ == "__main__":
     main()
