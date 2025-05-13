@@ -13,6 +13,7 @@ sys.path.append(site_packages)
 import pyxdf
 import mne
 
+# TODO: After reading in xdf file move to another location (to indicate it has already been read)
 FILEPATTERN = "dummy_data/*.xdf"
 ID_TO_STREAM = {}
 file_paths = glob.glob(FILEPATTERN)
