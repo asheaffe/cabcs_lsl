@@ -28,10 +28,10 @@ class SMI_ETG:
         
         # Define channel labels for the stream
         self.channel_labels = [
-            "GazeX_Left", "GazeY_Left", 
+            "GazeX_Both", "GazeY_Both", 
+            "GazeX_Left", "GazeY_Left",
             "GazeX_Right", "GazeY_Right",
-            "PupilDiameter_Left", "PupilDiameter_Right",
-            "Confidence_Left", "Confidence_Right"
+            "PupilRadius_Left", "PupilRadius_Right",
         ]
         
         # Initialize LSL stream
@@ -77,10 +77,19 @@ class SMI_ETG:
         except Exception as e:
             print(f"Error in processing gaze data: {e}")
 
+    def pupil_dilation(self):
+        """Pupil dilation calculation TEST"""
+        left = self.channel_labels.index("PupilDiameter_Left")
+        right = self.channel_labels.index("PupilDiameter_Right")
+
+        print(f"Left pupil diameter: {left}")
+        print(f"Right pupil diameter: {right}")
+
 # Example usage
 if __name__ == "__main__":
     # Create the ETG-LSL bridge
     etg_lsl = SMI_ETG(stream_name="SMI_EyeTracker", stream_type="Gaze")
+    #etg_lsl.pupil_dilation()
     
     print("Streaming eye tracking data to LSL. Press Ctrl+C to stop...")
     try:

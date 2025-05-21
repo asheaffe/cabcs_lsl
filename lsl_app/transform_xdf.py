@@ -51,7 +51,7 @@ def FindStream(data, stream_type):
     stream_type: type of stream ('nirs', 'eeg', etc.) as used in LabRecorder
     """
     for i, stream in enumerate(data):
-        #print("STREAM TYPE: ", stream['info']['type'][0].lower())
+        print("STREAM TYPE: ", stream['info']['type'][0].lower())
         if stream_type in stream['info']['type'][0].lower():
             # return the stream if it exists
             return data[i]
@@ -153,6 +153,31 @@ def ConvertfNIRS(data_dict, pid):
     
     return raw
 
+def ConvertETG(data_dict, pid):
+    """Calculates Pupil Dilation and saves to .fif file (?)
+    
+    :param data_dict: dictionary of data read in with pid
+    :param pid: id num for the data being read
+    :return: raw data"""
+    etg = FindStream(data_dict[pid][0], "gaze")
+    print()
+    
+    if etg is not None:
+        data = etg['time_series'].T
+    else:
+        print(f"ETG stream data not found. File ID: {pid}")
+        return None
+    
+    # ik this is ugly i just dont care
+    # PupilDiameter_Left is the fourth channel
+    #left = data['info']['PupilDiameter_Left']
+
+    left = data[6]
+    right = data[7]
+
+    print(f"Mean left eye diameter: {np.mean(left)}")
+    print(f"Mean right eye diameter: {np.mean(right)}")
+
 def see_data(raw_data):
     """Takes an MNE-Python Raw object and prints the important info for easier debugging"""
     data, times = raw_data[:, :]
@@ -197,7 +222,7 @@ def create_file(folder_path, data_dict):
     # return the number of data files created
     return len(data_dict)
 
-def clear_files(folder_path):
+def clear_data_files(folder_path):
     """Debugging function for clearing all data files during testing
     
     :folder_path: str path to folder containing files to delete
@@ -230,6 +255,49 @@ def clear_files(folder_path):
 
     return count
 
+def clear_fnirs_eeg(folder_path, type):
+    """Debugging function for clearing fnirs/eeg fif files
+    
+    :param folder_path: str path to directory from which to delete files
+    :param type: str either eeg or fnirs
+    :return: count number of files deleted"""
+
+    # first check if the file path exists
+    if not os.path.exists(folder_path):
+        print(f"Folder doesn't exist: {folder_path}")
+        return None
+    
+    # get all files in the folder
+    files = os.listdir(folder_path)   # change this with real data
+
+    temp = folder_path.split("/")[1]
+
+    if type == "eeg":
+        temp = "_eeg.fif"
+    if type == "fnirs":
+        temp = "_fnirs_raw.fif"
+    else:
+        print(f"{temp} is not a valid file type")
+        return None
+
+    # regex matching files with "data_#"
+    pattern = re.compile(f"(\\d+){temp}")
+    matching_files = [f for f in files if pattern.match(f)]
+
+    # delete each matching file
+    count = 0
+    for file in matching_files:
+        filepath = os.path.join(folder_path, file)
+        try:
+            # make sure it's a file
+            if os.path.isfile(filepath):
+                os.remove(filepath)
+                count += 1
+        except Exception as e:
+            print(f"Error deleting {filepath}: {e}")
+
+    return count
+
 def write_data(filepath, data):
     with open(filepath, 'w') as file:
         for line in data:
@@ -241,14 +309,18 @@ def write_data(filepath, data):
 
 def main():
     #ConvertEEG(data)
+    
     num_files = create_file("dummy_data", ID_TO_STREAM)
 
-    for i in range(num_files):
-        ConvertEEG(ID_TO_STREAM, i)
-        ConvertfNIRS(ID_TO_STREAM, i)
+    for id in range(num_files):
+        #ConvertEEG(ID_TO_STREAM, id)
+        #ConvertfNIRS(ID_TO_STREAM, id)
+        ConvertETG(ID_TO_STREAM, id)
 
     #print(ID_TO_STREAM)
-    clear_files("dummy_data")
+    clear_data_files("dummy_data")
+    clear_fnirs_eeg("dummy_data/fnirs", "fnirs")
+    #clear_fnirs_eeg("dummy_data/eeg", "eeg")
 
 if __name__ == "__main__":
     main()
