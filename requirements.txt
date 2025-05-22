@@ -1,0 +1,5 @@
+pylsl
+numpy
+pyqtgraph
+pyxdf
+mne
