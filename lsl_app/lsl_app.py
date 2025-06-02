@@ -18,8 +18,10 @@ from typing import List
 import numpy as np
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore, QtGui
+from PyQt5 import QtCore
 
 import pylsl
+from pylsl import local_clock
 
 # Basic parameters for the plotting window
 plot_duration = 5  # how many seconds of data to show
@@ -178,20 +180,20 @@ def main():
             inlet.pull_and_plot(mintime, plt)
 
     # create a timer that will move the view every update_interval ms
-    update_timer = QtCore.QTimer()
-    update_timer.timeout.connect(scroll)
-    update_timer.start(update_interval)
+    timestamp = local_clock()-0.125
+    # update_timer.timeout.connect(scroll)
+    # update_timer.start(update_interval)
 
     # create a timer that will pull and add new data occasionally
-    pull_timer = QtCore.QTimer()
-    pull_timer.timeout.connect(update)
-    pull_timer.start(pull_interval)
+    # pull_timer = QtCore.QTimer()
+    # pull_timer.timeout.connect(update)
+    # pull_timer.start(pull_interval)
 
     import sys
 
     # Start Qt event loop unless running in interactive mode or using pyside.
     if (sys.flags.interactive != 1) or not hasattr(QtCore, "PYQT_VERSION"):
-        QtGui.QGuiApplication.instance().exec_()
+        QtGui.QGuiApplication.instance().exec()
 
 
 if __name__ == "__main__":

@@ -188,6 +188,23 @@ def see_data(raw_data):
     # for i, ch_name in enumerate(raw_data.ch_names):
     #     print(f"Channel {ch_name}: {data[i, :5]}...")
 
+def print_data(pid, stype, data_dict=ID_TO_STREAM):
+    """Just prints raw data for debugging purposes
+    
+    :param files: dictionary with id mapped to data from file
+    :param id: current id to read data from
+    :param type: stream type (i.e. gaze, nirs, response)"""
+    data = FindStream(data_dict[pid][0], stype)
+    print()
+    
+    if data is not None:
+        data = data['time_series'].T
+    else:
+        print(f"{stype} stream data not found. File ID: {pid}")
+        return None
+    
+    print(data)
+
 def create_file(folder_path, data_dict):
     """Creates a new file to write data to for each file read in
 
@@ -311,15 +328,16 @@ def main():
     #ConvertEEG(data)
     
     num_files = create_file("dummy_data", ID_TO_STREAM)
-
-    for id in range(num_files):
-        #ConvertEEG(ID_TO_STREAM, id)
-        #ConvertfNIRS(ID_TO_STREAM, id)
-        ConvertETG(ID_TO_STREAM, id)
+    print(ID_TO_STREAM.keys())
+    print_data(2, "response")
+    # for id in range(num_files):
+    #     #ConvertEEG(ID_TO_STREAM, id)
+    #     #ConvertfNIRS(ID_TO_STREAM, id)
+    #     ConvertETG(ID_TO_STREAM, id)
 
     #print(ID_TO_STREAM)
     clear_data_files("dummy_data")
-    clear_fnirs_eeg("dummy_data/fnirs", "fnirs")
+    # clear_fnirs_eeg("dummy_data/fnirs", "fnirs")
     #clear_fnirs_eeg("dummy_data/eeg", "eeg")
 
 if __name__ == "__main__":
