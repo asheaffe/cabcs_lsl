@@ -3,3 +3,6 @@ numpy
 pyqtgraph
 pyxdf
 mne
+asyncio
+websockets
+rich
