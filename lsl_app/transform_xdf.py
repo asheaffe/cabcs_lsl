@@ -13,6 +13,9 @@ sys.path.append(site_packages)
 import pyxdf
 import mne
 
+global FILEPATTERN
+global ID_TO_STREAM
+
 # TODO: After reading in xdf file move to another location (to indicate it has already been read)
 FILEPATTERN = "dummy_data/*.xdf"
 ID_TO_STREAM = {}
@@ -177,6 +180,14 @@ def ConvertETG(data_dict, pid):
 
     print(f"Mean left eye diameter: {np.mean(left)}")
     print(f"Mean right eye diameter: {np.mean(right)}")
+
+def ConvertNback(data_dict, pid):
+    """Converts to readable nback data"""
+    response_map = {
+            1: "YES",
+            0: "NO",
+            -1: "NO RESPONSE"
+        }
 
 def see_data(raw_data):
     """Takes an MNE-Python Raw object and prints the important info for easier debugging"""

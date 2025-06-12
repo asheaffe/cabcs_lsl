@@ -3,8 +3,24 @@
 
 import asyncio
 import json
+import sys
 from aiohttp import web
 from datetime import datetime
+
+def minimize_browser():
+    """Used to automatically minimize windows after each block"""
+    try:
+        if win32gui.IsWindowVisible(hwnd):
+            window_title = win32gui.GetWindowText(hwnd).lower()
+
+            browser_keywords = ['qualtrics']
+            if any(keyword in window_title for keyword in browser_keywords):
+                win32gui.ShowWindow(hwnd, win32con.SW_MINIMIZE)
+                print(f"Minimized window: {win32gui.GetWindowText(hwnd)}")
+
+    except Exception as e:
+        print(f"Error minimizing windows: {e}")
+            
 
 async def handle_post(request):
     """Handle POST requests and print out the data"""
@@ -32,6 +48,9 @@ async def handle_post(request):
             print(f"Raw Data: {data}")
         
         print("--- End Request ---\n")
+
+        # minimize qualtrics window
+        minimize_browser()
         
         # Return a success response with CORS headers
         response = web.json_response({
@@ -121,4 +140,13 @@ async def main():
         await runner.cleanup()
 
 if __name__ == '__main__':
-    asyncio.run(main())
+    # check that platform is Windows for window minimization
+    try:
+        if sys.platform == "win32":
+            import win32gui
+            import win32con
+            asyncio.run(main())
+    except ImportError:
+        print(f"Warning: Platform specific libraries not available for {sys.platform}")
+
+    

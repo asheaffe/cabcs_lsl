@@ -6,3 +6,5 @@ mne
 asyncio
 websockets
 rich
+psychopy
+aiohttp

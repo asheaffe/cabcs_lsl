@@ -1,0 +1,21 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# cmake
+cppcmake.yml
+
+# vscode
+.vs
+
+# lsl app stuff
+bin-Windows7-32
+lib-Windows7-32
+
+# watch stuff
+watch
+
+# testing stuff
+lsl_app/ReceiveDataInChunks.py
+lsl_app/dummy_data
