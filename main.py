@@ -69,12 +69,29 @@ async def main():
         )
         subprocesses.append(script)
 
-        labrecorder = await asyncio.create_subprocess_exec(
-            "C:/Users/annsb/Downloads/LabRecorder-1.16.4-Win_amd64/LabRecorder/LabRecorder.exe",
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE
-        )
-        subprocesses.append(labrecorder)
+        try:
+            # my personal laptop location
+            labrecorder = await asyncio.create_subprocess_exec(
+                "C:/Users/annsb/Downloads/LabRecorder-1.16.4-Win_amd64/LabRecorder/LabRecorder.exe",
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE
+            )
+            subprocesses.append(labrecorder)
+        except:
+            # lab computer location
+            labrecorder = await asyncio.create_subprocess_exec(
+                "C:/Users/HCI/Downloads/LabRecorder-1.16.4-Win_amd64/LabRecorder/LabRecorder.exe",
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE
+            )
+            subprocesses.append(labrecorder)
+
+        # iview_etg = await asyncio.create_subprocess_exec(
+        #     "C:/ProgramData/Microsoft/Windows/Start Menu/Programs/SMI/iView ETG/iView ETG.exe",
+        #     stdout=asyncio.subprocess.PIPE,
+        #     stderr=asyncio.subprocess.PIPE
+        # )
+        # subprocesses.append(iview_etg)
 
         while True:
             await asyncio.sleep(1)
