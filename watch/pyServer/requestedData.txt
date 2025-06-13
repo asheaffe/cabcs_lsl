@@ -1,0 +1,48 @@
+{"name":"Accelerometer","timestamp":6336041417080,"x":0,"y":0,"z":0,"unit":"m/s^2"}
+{"name":"HR","timestamp":1748363538317,"hr":0,"hrStatus":-3,"iBI":32768,"unit":"bpm"}
+{"name":"Skin Temp","timestamp":1748363538386,"ambientTemp":28,"objTemp":25,"unit":"Celsius"}
+{"name":"Accelerometer","timestamp":6337162785488,"x":0,"y":0,"z":0,"unit":"m/s^2"}
+{"name":"HR","timestamp":1748363539317,"hr":0,"hrStatus":-3,"iBI":32768,"unit":"bpm"}
+{"name":"HR","timestamp":1748363540320,"hr":0,"hrStatus":-3,"iBI":32768,"unit":"bpm"}
+{"name":"Accelerometer","timestamp":6338283848721,"x":0,"y":0,"z":0,"unit":"m/s^2"}
+{"name":"HR","timestamp":1748363541321,"hr":0,"hrStatus":-3,"iBI":32768,"unit":"bpm"}
+{"name":"Accelerometer","timestamp":6339405095059,"x":0,"y":0,"z":0,"unit":"m/s^2"}
+{"name":"HR","timestamp":1748363542323,"hr":0,"hrStatus":-3,"iBI":32768,"unit":"bpm"}
+{"name":"Accelerometer","timestamp":6340526402432,"x":0,"y":0,"z":0,"unit":"m/s^2"}
+{"name":"HR","timestamp":1748363543323,"hr":0,"hrStatus":-3,"iBI":32768,"unit":"bpm"}
+{"name":"Skin Temp","timestamp":1748363543392,"ambientTemp":28,"objTemp":25,"unit":"Celsius"}
+{"name":"Accelerometer","timestamp":6341647557217,"x":0,"y":0,"z":0,"unit":"m/s^2"}
+{"name":"HR","timestamp":1748363544323,"hr":0,"hrStatus":-3,"iBI":32768,"unit":"bpm"}
+{"name":"Accelerometer","timestamp":6342768589932,"x":0,"y":0,"z":0,"unit":"m/s^2"}
+{"name":"HR","timestamp":1748363545329,"hr":0,"hrStatus":-3,"iBI":32768,"unit":"bpm"}
+{"name":"Accelerometer","timestamp":6343889714199,"x":0,"y":0,"z":0,"unit":"m/s^2"}
+{"name":"HR","timestamp":1748363546325,"hr":0,"hrStatus":-3,"iBI":32768,"unit":"bpm"}
+movement
+{"name":"Accelerometer","timestamp":6346131566006,"x":0,"y":0,"z":0,"unit":"m/s^2"}
+{"name":"HR","timestamp":1748363548328,"hr":0,"hrStatus":-3,"iBI":32768,"unit":"bpm"}
+{"name":"Skin Temp","timestamp":1748363548396,"ambientTemp":28,"objTemp":23,"unit":"Celsius"}
+{"name":"HR","timestamp":1748363549328,"hr":0,"hrStatus":-3,"iBI":32768,"unit":"bpm"}
+{"name":"Accelerometer","timestamp":6347252446133,"x":0,"y":0,"z":0,"unit":"m/s^2"}
+{"name":"HR","timestamp":1748363550329,"hr":0,"hrStatus":-3,"iBI":32768,"unit":"bpm"}
+{"name":"Accelerometer","timestamp":6348373143154,"x":0,"y":0,"z":0,"unit":"m/s^2"}
+{"name":"HR","timestamp":1748363551330,"hr":0,"hrStatus":-3,"iBI":32768,"unit":"bpm"}
+{"name":"Accelerometer","timestamp":6349494053799,"x":0,"y":0,"z":0,"unit":"m/s^2"}
+{"name":"HR","timestamp":1748363552331,"hr":0,"hrStatus":-3,"iBI":32768,"unit":"bpm"}
+{"name":"Accelerometer","timestamp":6350614598232,"x":0,"y":0,"z":0,"unit":"m/s^2"}
+{"name":"HR","timestamp":1748363553331,"hr":0,"hrStatus":-3,"iBI":32768,"unit":"bpm"}
+{"name":"Skin Temp","timestamp":1748363553399,"ambientTemp":28,"objTemp":25,"unit":"Celsius"}
+movement
+{"name":"Accelerometer","timestamp":6356220677334,"x":0,"y":0,"z":0,"unit":"m/s^2"}
+{"name":"HR","timestamp":1748363558336,"hr":0,"hrStatus":-3,"iBI":32768,"unit":"bpm"}
+{"name":"Skin Temp","timestamp":1748363558404,"ambientTemp":28,"objTemp":24,"unit":"Celsius"}
+{"name":"HR","timestamp":1748363559338,"hr":0,"hrStatus":-3,"iBI":32768,"unit":"bpm"}
+{"name":"Accelerometer","timestamp":6357342198330,"x":0,"y":0,"z":0,"unit":"m/s^2"}
+{"name":"HR","timestamp":1748363560339,"hr":0,"hrStatus":-3,"iBI":32768,"unit":"bpm"}
+movement
+{"name":"HR","timestamp":1748363568347,"hr":0,"hrStatus":-3,"iBI":32768,"unit":"bpm"}
+{"name":"Skin Temp","timestamp":1748363568415,"ambientTemp":28,"objTemp":24,"unit":"Celsius"}
+{"name":"Accelerometer","timestamp":6366310948330,"x":0,"y":0,"z":0,"unit":"m/s^2"}
+{"name":"HR","timestamp":1748363569348,"hr":0,"hrStatus":-3,"iBI":32768,"unit":"bpm"}
+{"name":"Accelerometer","timestamp":6367431858975,"x":0,"y":0,"z":0,"unit":"m/s^2"}
+{"name":"HR","timestamp":1748363570348,"hr":0,"hrStatus":-3,"iBI":32768,"unit":"bpm"}
+{"name":"Accelerometer","timestamp":6368552647549,"x":0,"y":0,"z":0,"unit":"m/s^2"}

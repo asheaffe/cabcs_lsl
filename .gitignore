@@ -13,9 +13,6 @@ cppcmake.yml
 bin-Windows7-32
 lib-Windows7-32
 
-# watch stuff
-watch
-
 # testing stuff
 lsl_app/ReceiveDataInChunks.py
 lsl_app/dummy_data
