@@ -28,7 +28,7 @@ object WebSocketClient {
 
     // Channel to send outgoing messages from outside
     private val outgoingMessages = Channel<String>(capacity = Channel.UNLIMITED)
-    private val host_ip: String = "10.5.14.129" // change to whatever your ip is
+    private val host_ip: String = "10.5.13.122" // change to whatever your ip is
     private var sessionJob: Job? = null
     private lateinit var listener: WebSocketListener
 

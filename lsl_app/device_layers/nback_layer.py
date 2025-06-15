@@ -24,24 +24,32 @@ class NbackLayer:
         # convert to full list for correct sample format
         marker_codes = {
             "0/START": 100,
-            "0/YES": 101,
-            "0/NO": 102,
+            "0/IS_TARGET": 101,
+            "0/NOT_TARGET": 102,
             "1/START": 110,
-            "1/YES": 111,
-            "1/NO": 112,
+            "1/IS_TARGET": 111,
+            "1/NOT_TARGET": 112,
             "2/START": 120,
-            "2/YES": 121,
-            "2/NO": 122
+            "2/IS_TARGET": 121,
+            "2/NOT_TARGET": 122,
+            "0/RESPONSE/A": 150,
+            "0/RESPONSE/B": 151,
+            "1/RESPONSE/A": 152,
+            "1/RESPONSE/B": 153,
+            "2/RESPONSE/A": 154,
+            "2/RESPONSE/B": 155,
+            "0/RESPONSE/A": 156,
+            "0/RESPONSE/B": 157,            
         }
         
         self.outlet.push_sample([marker_codes[marker]])
 
-if __name__ == "__main__":
-    layer = NbackLayer()
+# if __name__ == "__main__":
+#     layer = NbackLayer()
 
-    try:
-        while True:
-            time.sleep(1)
+#     try:
+#         while True:
+#             time.sleep(1)
             
-    except KeyboardInterrupt:
-        print("Stopping...")
+#     except KeyboardInterrupt:
+#         print("Stopping...")

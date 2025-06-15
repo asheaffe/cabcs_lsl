@@ -24,7 +24,14 @@ class DRT_layer:
         self.outlet = p.StreamOutlet(self.info)
 
     def send_sample(self, marker):
-        self.outlet.push_sample([marker])
+        # dictionary for different data types/codes
+        marker_codes = {
+            "STIM": 0,
+            "RESPONSE": 1
+        }
+        
+        print(marker)
+        self.outlet.push_sample([marker_codes[marker]])
 
 if __name__ == "__main__":
     # Create the ETG-LSL bridge

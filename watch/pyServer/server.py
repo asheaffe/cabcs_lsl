@@ -2,9 +2,20 @@ import asyncio
 from websockets.asyncio.server import serve
 import websockets
 import aiofiles
+import sys
+import os
+from inputs import get_gamepad
+
+# netstat -ano | findstr :8765
+# windows + R -> resmon -> sort by pid and find the one from last step [[last number output]]
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+from lsl_app.device_layers.drt_layer import DRT_layer
 
 movementRequest = False
 
+# initialize DRT layer
+drt = DRT_layer()
 
 # Keep track of connected clients
 connected_clients = set()
@@ -46,6 +57,9 @@ async def send_periodic_messages():
         if len(connected_clients) > 0:
             movementRequest = True
             await asyncio.gather(*[client.send("EXECUTE_VIBRATION") for client in connected_clients])
+
+            # send to lsl 
+            drt.send_sample("STIM")
         await asyncio.sleep(10)
         
 
