@@ -80,7 +80,7 @@ class Qualtrics():
             # Handle JSON data
             if 'application/json' in content_type:
                 data = await request.json()
-                self.json_data = json.dumps(data, indent=2)
+                self.json_data = data
 
                 # signal that data has been received 
                 if hasattr(self, 'data_received_event'):

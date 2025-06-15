@@ -112,8 +112,9 @@ async def main():
         await qualtrics.data_received_event.wait()
         
         qdata = qualtrics.json_data
-        print(qdata)
-        
+        nback_level = int(qdata['field1'].split(" ")[1][0])
+        block_num = int(qdata['blockNum'])
+
         win = visual.Window(
                     fullscr=False,
                     color='black',
@@ -121,8 +122,7 @@ async def main():
                     winType='pyglet'
                 )
 
-        nback_level = 0
-        nback_app = asyncio.create_task(run_pygame_thread(marker_stream=layer, n_level=nback_level, block_num=1, win=win))
+        nback_app = asyncio.create_task(run_pygame_thread(marker_stream=layer, n_level=nback_level, block_num=block_num, win=win))
 
         await nback_app 
 
