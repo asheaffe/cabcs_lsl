@@ -17,6 +17,11 @@ lib-Windows7-32
 lsl_app/ReceiveDataInChunks.py
 lsl_app/dummy_data
 
+# files that don't need to be passed back and forth
+watch/hci_lab_build/
+results/
+test.cpp
+
 # lab computer has python3.11 and my laptop has python3
 # keeping them saved locally for convenience
 processes.ps1
