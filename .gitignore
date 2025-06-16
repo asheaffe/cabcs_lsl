@@ -16,3 +16,7 @@ lib-Windows7-32
 # testing stuff
 lsl_app/ReceiveDataInChunks.py
 lsl_app/dummy_data
+
+# lab computer has python3.11 and my laptop has python3
+# keeping them saved locally for convenience
+processes.ps1
