@@ -12,6 +12,7 @@ import os
 from psychopy import visual
 from rich import print
 from lsl_app.device_layers.nback_layer import NbackLayer
+from watch.pyServer.server import Server
 from nback_2025.nback import Nback
 from qualtrics import Qualtrics
 
@@ -55,21 +56,10 @@ async def main():
     try:
         script = await asyncio.create_subprocess_exec(
             'powershell', '-ExecutionPolicy', 'Bypass', '-File', 'processes.ps1',
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE
+            # stdout=asyncio.subprocess.PIPE,
+            # stderr=asyncio.subprocess.PIPE
         )
         subprocesses.append(script)
-
-        # TODO: ngrok automatically opens when we run main.py (???)
-        ngrok = await asyncio.create_subprocess_exec(
-            'powershell', '-Command', 'Start-Process', 'powershell', 
-            '-ArgumentList', '"-NoExit", "-Command", "ngrok.exe http --url=raccoon-steady-infinitely.ngrok-free.app 8080"',
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE
-        )
-        subprocesses.append(ngrok)
-
-        print(f"ngrok process started with PID: {ngrok.pid}")
 
         layer = NbackLayer()
 
@@ -92,6 +82,7 @@ async def main():
 
         # get post data from qualtrics 
         qualtrics = await Qualtrics.create()
+        wserver = await Server.create(layer)
         #subprocesses.append(qualtrics)
 
         # keep receiving nback data until Ctrl+C
@@ -148,9 +139,13 @@ async def main():
         if 'win' in locals():
             win.close()
 
-        # close ngrok server
+        # close qualtrics
         if 'qualtrics' in locals():
             await qualtrics.cleanup()
+
+        # close ngrok terminal
+        if 'ngrok' in locals():
+            await ngrok.cleanup()
 
         print("Cleanup complete")
 

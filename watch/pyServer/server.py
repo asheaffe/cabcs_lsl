@@ -4,18 +4,11 @@ import websockets
 import aiofiles
 import sys
 import os
-from inputs import get_gamepad
 
 # netstat -ano | findstr :8765
 # windows + R -> resmon -> sort by pid and find the one from last step [[last number output]]
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-from lsl_app.device_layers.drt_layer import DRT_layer
-
 movementRequest = False
-
-# initialize DRT layer
-drt = DRT_layer()
 
 # Keep track of connected clients
 connected_clients = set()
@@ -50,23 +43,41 @@ async def echo(websocket):
     except Exception as e:
         print(f"{RED}Unexpected error: {e}{RESET}")
 
-async def send_periodic_messages():
+async def send_periodic_messages(stream):
     global movementRequest
     while True:
-        print(f"len conn clients: {len(connected_clients)}")
-        if len(connected_clients) > 0:
+        #print(f"len conn clients: {len(connected_clients)}")
+        if len(connected_clients) >= 0:
+            # send to lsl 
+            stream.send_sample("STIM")
             movementRequest = True
             await asyncio.gather(*[client.send("EXECUTE_VIBRATION") for client in connected_clients])
 
-            # send to lsl 
-            drt.send_sample("STIM")
+            
         await asyncio.sleep(10)
         
+class Server():
+    def __init__(self):
+        print(f"WebSocket server is running")
+    
+    async def _async_init(self, stream):
+        sendMsgs = asyncio.create_task(send_periodic_messages(stream))
+        async with serve(echo, "0.0.0.0", 8765) as server:
+            sendMsgs
+            await server.serve_forever()
 
+    @classmethod
+    async def create(cls, markers):
+        """Main function to run the server"""
+        instance = cls()
+        await instance._async_init(markers)
+        return instance
+    
+ 
 async def main():
     print(f"WebSocket server is running")
     # Create the periodic hello message task
-    sendMsgs = asyncio.create_task(send_periodic_messages())
+    sendMsgs = asyncio.create_task(send_periodic_messages(markers))
     async with serve(echo, "0.0.0.0", 8765) as server:
         sendMsgs
         await server.serve_forever()
