@@ -24,4 +24,4 @@ test.cpp
 
 # lab computer has python3.11 and my laptop has python3
 # keeping them saved locally for convenience
-processes.ps1
+.ps1
