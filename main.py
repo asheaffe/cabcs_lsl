@@ -61,12 +61,15 @@ async def main():
         subprocesses.append(script)
 
         # TODO: ngrok automatically opens when we run main.py (???)
-        # ngrok = await asyncio.create_subprocess_exec(
-        #     '.\\ngrok.exe', 'http', '8080',
-        #     stdout=asyncio.subprocess.PIPE,
-        #     stderr=asyncio.subprocess.PIPE
-        # )
-        # subprocesses.append(ngrok)
+        ngrok = await asyncio.create_subprocess_exec(
+            'powershell', '-Command', 'Start-Process', 'powershell', 
+            '-ArgumentList', '"-NoExit", "-Command", "ngrok.exe http --url=raccoon-steady-infinitely.ngrok-free.app 8080"',
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE
+        )
+        subprocesses.append(ngrok)
+
+        print(f"ngrok process started with PID: {ngrok.pid}")
 
         layer = NbackLayer()
 
