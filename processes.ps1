@@ -8,3 +8,4 @@ $processes += Start-Process python3.11 -ArgumentList "lsl_app/device_layers/etg_
 #$processes += Start-Process python3.11 -ArgumentList "nback_2025/nback_layer.py" -WindowStyle Hidden -PassThru
 $processes += Start-Process python3.11 -ArgumentList "lsl_app/device_layers/watch_layer.py" -WindowStyle Hidden -PassThru
 $processes += Start-Process python3.11 -ArgumentList "lsl_app/device_layers/drt_layer.py" -WindowStyle Hidden -PassThru
+$processes += Start-Process powershell -ArgumentList "-Command", "ngrok.exe http --url=raccoon-steady-infinitely.ngrok-free.app 8080"
