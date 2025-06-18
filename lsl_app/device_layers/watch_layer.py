@@ -30,24 +30,26 @@ hr_outlet   = create_lsl_outlet("HR", 1, ['HR', 'hr_status'], 1.0)
 acc_outlet  = create_lsl_outlet('Accelerometer', 3, ['accX', 'accY', 'accZ'], 25.0) 
 temp_outlet = create_lsl_outlet('Temperature', 1, ['ambientTemp', 'objTemp'], .2)
 
-async def server_code(websocket):
+async def server_code():
     print(f"[green]Client Connected![/green]")
-    CLIENT = websocket
+    #CLIENT = websocket
     
     sendMsgs = asyncio.create_task(run_DRT())
 
-    async for message in websocket:
-        
-        async with aiofiles.open("data.txt", "a") as f:
-            await f.write(f"{message}\n")
+    async with websockets.connect("ws://localhost:8765") as websocket:
+        print("[green]Watch layer connected to server![/green]")
+        async for message in websocket:
+            
+            async with aiofiles.open("data.txt", "a") as f:
+                await f.write(f"{message}\n")
 
-        match message['name']:
-            case "Heart Rate":
-                hr_outlet.push_sample([message['hr'], message['hrStatus']])
-            case "Accelerometer":
-                acc_outlet.push_sample([message['x'], message['y'], message['z']])
-            case "Skin Temp":
-                temp_outlet.push_sample([message['ambientTemp'], message['objTemp']])
+            match message['name']:
+                case "Heart Rate":
+                    hr_outlet.push_sample([message['hr'], message['hrStatus']])
+                case "Accelerometer":
+                    acc_outlet.push_sample([message['x'], message['y'], message['z']])
+                case "Skin Temp":
+                    temp_outlet.push_sample([message['ambientTemp'], message['objTemp']])
     
 async def run_DRT():
     for i in range(10):
@@ -55,8 +57,7 @@ async def run_DRT():
         await CLIENT.send("EXECUTE_VIBRATION")
 
 async def main():
-    server = await serve(server_code, "0.0.0.0", 8765)
-    await server.serve_forever()
+    server = await server_code()
 
 if __name__ == "__main__":
     try:

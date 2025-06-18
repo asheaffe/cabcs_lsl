@@ -46,13 +46,14 @@ async def echo(websocket):
 async def send_periodic_messages(stream):
     global movementRequest
     while True:
-        #print(f"len conn clients: {len(connected_clients)}")
-        if len(connected_clients) >= 0:
-            # send to lsl 
-            stream.send_sample("STIM")
+        print(f"len conn clients: {len(connected_clients)}")
+        if len(connected_clients) > 0:
+            
             movementRequest = True
-            await asyncio.gather(*[client.send("EXECUTE_VIBRATION") for client in connected_clients])
+            await asyncio.gather(*[websocket.send("EXECUTE_VIBRATION") for client in connected_clients])
 
+            # send to lsl 
+            stream.send_sample("DRT_STIM")
             
         await asyncio.sleep(10)
         
@@ -72,22 +73,3 @@ class Server():
         instance = cls()
         await instance._async_init(markers)
         return instance
-    
- 
-async def main():
-    print(f"WebSocket server is running")
-    # Create the periodic hello message task
-    sendMsgs = asyncio.create_task(send_periodic_messages(markers))
-    async with serve(echo, "0.0.0.0", 8765) as server:
-        sendMsgs
-        await server.serve_forever()
-        # # Start periodic message task
-        # await asyncio.gather(server.wait_closed(), send_periodic_messages())
-
-
-if __name__ == "__main__":
-    try:
-        asyncio.run(main())
-    except KeyboardInterrupt:
-        print(f"{BLUE}Server stopped by keyboard interrupt{RESET}")
-

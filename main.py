@@ -82,7 +82,10 @@ async def main():
 
         # get post data from qualtrics 
         qualtrics = await Qualtrics.create()
+        
         wserver = await Server.create(layer)
+        
+        
         #subprocesses.append(qualtrics)
 
         # keep receiving nback data until Ctrl+C

@@ -40,11 +40,11 @@ class NbackLayer:
             "2/RESPONSE/B": 155,
             "0/RESPONSE/A": 156,
             "0/RESPONSE/B": 157,  
-            "STIM": 00,
-            "RESPONSE": 11          
+            "DRT_STIM": 00,
+            "DRT_RESPONSE": 11          
         }
 
-        print(f"MARKER: {marker}")
+        #print(f"MARKER: {marker}")
         
         self.outlet.push_sample([marker_codes[marker]])
 
