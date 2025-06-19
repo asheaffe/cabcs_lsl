@@ -53,9 +53,9 @@ try {
         
         # Check if any process has exited unexpectedly
         $runningProcesses = $processes | Where-Object { $_ -and !$_.HasExited }
-        if ($runningProcesses.Count -lt $processes.Count) {
-            Write-Host "Some processes have exited. Running processes: $($runningProcesses.Count)/$($processes.Count)"
-        }
+        # if ($runningProcesses.Count -lt $processes.Count) {
+        #     Write-Host "Some processes have exited. Running processes: $($runningProcesses.Count)/$($processes.Count)"
+        # }
         
         # If all processes have exited, break the loop
         if ($runningProcesses.Count -eq 0) {

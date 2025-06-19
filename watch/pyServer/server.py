@@ -1,3 +1,4 @@
+from rich import print
 import asyncio
 from websockets.asyncio.server import serve
 import websockets
@@ -45,15 +46,42 @@ async def echo(websocket):
 
 async def send_periodic_messages(stream):
     global movementRequest
+    client_connected = False
     while True:
-        print(f"len conn clients: {len(connected_clients)}")
+        
         if len(connected_clients) > 0:
-            
-            movementRequest = True
-            await asyncio.gather(*[websocket.send("EXECUTE_VIBRATION") for client in connected_clients])
 
+            # only print when there is a change
+            if not client_connected:
+                print("[green]Watch layer connected![/green]")
+                client_connected = True
+
+            movementRequest = True
+            disconnected_clients = []
+            
+            # use copy to avoid modification
+            for client in connected_clients.copy():  
+                try:
+                    await asyncio.gather(client.send("EXECUTE_VIBRATION"))
+                except websockets.exceptions.ConnectionClosedError:
+                    print(f"{RED}Client disconnected during send, removing from list{RESET}")
+                    disconnected_clients.append(client)
+                except Exception as e:
+                    print(f"{RED}Error sending to client: {e}{RESET}")
+                    disconnected_clients.append(client)
+            
+            # Remove disconnected clients
+            for client in disconnected_clients:
+                connected_clients.discard(client)
             # send to lsl 
             stream.send_sample("DRT_STIM")
+
+        else:
+            # change client_connected to False if there's a change
+            if client_connected:
+                print("[red]Watch layer disconnected![/red]")
+                client_connected = False
+
             
         await asyncio.sleep(10)
         
@@ -64,8 +92,7 @@ class Server():
     async def _async_init(self, stream):
         sendMsgs = asyncio.create_task(send_periodic_messages(stream))
         async with serve(echo, "0.0.0.0", 8765) as server:
-            sendMsgs
-            await server.serve_forever()
+            await asyncio.gather(sendMsgs, server.serve_forever())
 
     @classmethod
     async def create(cls, markers):
