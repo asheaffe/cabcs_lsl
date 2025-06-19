@@ -86,7 +86,7 @@ class Qualtrics():
                 if hasattr(self, 'data_received_event'):
                     self.data_received_event.set()
 
-                print(f"JSON Data: {json.dumps(data, indent=2)}")
+                #print(f"JSON Data: {json.dumps(data, indent=2)}")
             
             # Handle form data
             elif 'application/x-www-form-urlencoded' in content_type:

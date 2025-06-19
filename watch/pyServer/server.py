@@ -90,9 +90,14 @@ class Server():
         print(f"WebSocket server is running")
     
     async def _async_init(self, stream):
-        sendMsgs = asyncio.create_task(send_periodic_messages(stream))
-        async with serve(echo, "0.0.0.0", 8765) as server:
-            await asyncio.gather(sendMsgs, server.serve_forever())
+        # sendMsgs = asyncio.create_task(send_periodic_messages(stream))
+        # async with serve(echo, "0.0.0.0", 8765) as server:
+        #     await asyncio.gather(sendMsgs, server.serve_forever())
+        server = await serve(echo, "0.0.0.0", 8765)
+        periodic_task = asyncio.create_task(send_periodic_messages(stream))
+        server_task = asyncio.create_task(server.serve_forever())
+
+        await asyncio.sleep(0.1)
 
     @classmethod
     async def create(cls, markers):

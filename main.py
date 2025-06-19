@@ -83,7 +83,9 @@ async def main():
         # get post data from qualtrics 
         qualtrics = await Qualtrics.create()
         
+        print("server process started")
         wserver = await Server.create(layer)
+        print("server process completed")
         
         
         #subprocesses.append(qualtrics)
