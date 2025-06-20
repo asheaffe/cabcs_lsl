@@ -29,15 +29,27 @@ hr_outlet   = create_lsl_outlet('HeartRate', 3, ['HR', 'hrStatus', 'IBI'], 1.0)
 acc_outlet  = create_lsl_outlet('Accelerometer', 3, ['accX', 'accY', 'accZ'], 25.0) 
 temp_outlet = create_lsl_outlet('Temperature', 2, ['ambientTemp', 'objTemp'], .2)
 
-async def receive_data(socket):
-    print(f"[green]Client Connected![/green]")
-    try:
-        async for message in socket:
+global CLIENTS
+CLIENTS = set()
+
+async def receive_watch_data(socket):
+    global CLIENTS
+    CLIENTS.add(socket)
+    if len(CLIENTS) == 1:
+        print(f"[green]DRT Client Connected![/green]")    
+    else:
+        print(f"[green]Watch Client Connected![/green]")
+        
+    async for message in socket:
+        if message == "EXECUTE_VIBRATION":
+            for client in CLIENTS:                
+                await client.send("EXECUTE_VIBRATION")                
+        else:
             async with aiofiles.open("data.txt", "a") as f:
                 await f.write(f"{message}\n")
             
             try:
-                data = json.loads(message)
+                data = json.loads(message)                
             except Exception as e:
                 print("[yellow]message not valid json. skipping.[/yellow]")
                         
@@ -50,12 +62,9 @@ async def receive_data(socket):
                     temp_outlet.push_sample([data['ambientTemp'], data['objTemp']])
                 case _:
                     print(f"[yellow]Unknown data type: {data.get('name')}[/yellow]")
-                    
-    except websockets.exceptions.ConnectionClosedError as e:
-        print(f"[red]Connection closed: {e}[/red]")        
-
+                        
 async def main():
-    async with serve(receive_data, "0.0.0.0", 8765) as server:
+    async with serve(receive_watch_data, "0.0.0.0", 8765) as server:
         await server.serve_forever()
 
 if __name__ == "__main__":

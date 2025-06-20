@@ -2,6 +2,9 @@ import asyncio
 import threading
 import atexit
 from websockets.asyncio.server import serve
+from websockets.sync.client import connect
+
+import socket
 import websockets
 import aiofiles
 import glob
@@ -45,12 +48,12 @@ def clean_subprocesses():
 # register cleanup
 atexit.register(clean_subprocesses)
 
-async def run_pygame_thread(**kwargs):
-    """Run pygame in separate thread"""
-    try:           
-        Nback(**kwargs) 
-    except Exception as e:
-        print(f"Pygame error: {e}")
+# async def run_pygame_thread(**kwargs):
+#     """Run pygame in separate thread"""
+#     try:           
+#         await Nback(**kwargs) 
+#     except Exception as e:
+#         print(f"Pygame error: {e}")
 
 async def main():
     try:
@@ -82,17 +85,14 @@ async def main():
 
         # get post data from qualtrics 
         qualtrics = await Qualtrics.create()
-        
-        print("server process started")
-        wserver = await Server.create(layer)
-        print("server process completed")
-        
+
+        sock = connect("ws://localhost:8765")
         
         #subprocesses.append(qualtrics)
 
         # keep receiving nback data until Ctrl+C
         while keep_running:
-            try:
+            # try:
                 print("waiting for POST data...")
 
                 # wait for POST request
@@ -101,9 +101,13 @@ async def main():
                 # extract data from json when POST is received
                 qdata = qualtrics.json_data
                 nback_level = int(qdata['field1'].split(" ")[1][0])
+                if_walk = qdata['field1'].split(" ")[0]
                 block_num = int(qdata['blockNum'])
                 practice = bool(qdata["practice"])
                 pid = int(qdata["pid"])
+
+                print(f"STARTING NBACK LEVEL: {nback_level}     BLOCK #: {block_num}")
+                print(f"PRACTICE: {practice}\tPID: {pid}\tif_walk: {if_walk}")
 
                 win = visual.Window(
                             fullscr=False,
@@ -111,31 +115,30 @@ async def main():
                             units='height',
                             winType='pyglet'
                         )
-
-                # pass data from json to nback app instance
-                nback_app = asyncio.create_task(run_pygame_thread(n_level=nback_level, 
+            
+                await asyncio.create_task(Nback(n_level=nback_level, 
                        block_num=block_num,                                              
                        pid=pid, 
                        practice=practice,
                        marker_stream=layer, 
-                       win=win))
-
-                await nback_app 
+                       win=win, 
+                       DRT_socket=sock, 
+                       walking=if_walk))                
 
                 # reset event for next iteration
                 qualtrics.data_received_event.clear()
             
-            except Exception as e:
-                print(f"Error occurred: {e}")
-                if not keep_running:
-                    break
+            # except Exception as e:
+            #     print(f"Error occurred: {e}")
+            #     if not keep_running:
+            #         break
 
     # Ctrl+C to exit
     except KeyboardInterrupt:
         print("Program interrupted by user")
 
-    except Exception as e:
-        print(f"Error occurred: {e}")
+    # except Exception as e:
+    #     print(f"Error occurred: {e}")
 
     finally:
         print("Cleaning all subprocesses...")
