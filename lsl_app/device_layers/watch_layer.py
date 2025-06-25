@@ -30,20 +30,19 @@ acc_outlet  = create_lsl_outlet('Accelerometer', 3, ['accX', 'accY', 'accZ'], 25
 temp_outlet = create_lsl_outlet('Temperature', 2, ['ambientTemp', 'objTemp'], .2)
 
 global CLIENTS
-CLIENTS = set()
+CLIENTS = []
 
 async def receive_watch_data(socket):
     global CLIENTS
-    CLIENTS.add(socket)
+    CLIENTS.append(socket)
     if len(CLIENTS) == 1:
         print(f"[green]DRT Client Connected![/green]")    
     else:
         print(f"[green]Watch Client Connected![/green]")
         
     async for message in socket:
-        if message == "EXECUTE_VIBRATION":
-            for client in CLIENTS:                
-                await client.send("EXECUTE_VIBRATION")                
+        if message == "EXECUTE_VIBRATION":                        
+            await CLIENTS[1].send("EXECUTE_VIBRATION")
         else:
             async with aiofiles.open("data.txt", "a") as f:
                 await f.write(f"{message}\n")
@@ -64,13 +63,13 @@ async def receive_watch_data(socket):
                     print(f"[yellow]Unknown data type: {data.get('name')}[/yellow]")
                         
 async def main():
-    async with serve(receive_watch_data, "0.0.0.0", 8765) as server:
+    async with serve(receive_watch_data, "0.0.0.0", 8765, ping_interval=None) as server:
         await server.serve_forever()
 
 if __name__ == "__main__":
-    try:
-        asyncio.run(main())
-    except KeyboardInterrupt:
-        print(f"[blue]Server stopped by keyboard interrupt[/blue]")
-    except Exception as e:
-        print(f"[red]Fatal error: {e}[/red]")
+    # try:
+    asyncio.run(main())
+    # except KeyboardInterrupt:
+    #     print(f"[blue]Server stopped by keyboard interrupt[/blue]")
+    # except Exception as e:
+    #     print(f"[red]Fatal error: {e}[/red]")

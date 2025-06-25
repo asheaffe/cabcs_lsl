@@ -56,7 +56,7 @@ atexit.register(clean_subprocesses)
 #         print(f"Pygame error: {e}")
 
 async def main():
-    try:
+    # try:
         script = await asyncio.create_subprocess_exec(
             'powershell', '-ExecutionPolicy', 'Bypass', '-File', 'processes.ps1',
             # stdout=asyncio.subprocess.PIPE,
@@ -110,7 +110,7 @@ async def main():
                 print(f"PRACTICE: {practice}\tPID: {pid}\tif_walk: {if_walk}")
 
                 win = visual.Window(
-                            fullscr=False,
+                            fullscr=True,
                             color='black',
                             units='height',
                             winType='pyglet'
@@ -123,8 +123,8 @@ async def main():
                        marker_stream=layer, 
                        win=win, 
                        DRT_socket=sock, 
-                       walking=if_walk))                
-
+                       walking=if_walk))
+                
                 # reset event for next iteration
                 qualtrics.data_received_event.clear()
             
@@ -134,28 +134,28 @@ async def main():
             #         break
 
     # Ctrl+C to exit
-    except KeyboardInterrupt:
-        print("Program interrupted by user")
+    # except KeyboardInterrupt:
+    #     print("Program interrupted by user")
 
     # except Exception as e:
     #     print(f"Error occurred: {e}")
 
-    finally:
-        print("Cleaning all subprocesses...")
+    # finally:
+    #     print("Cleaning all subprocesses...")
 
-        # close psychopy window
-        if 'win' in locals():
-            win.close()
+    #     # close psychopy window
+    #     if 'win' in locals():
+    #         win.close()
 
-        # close qualtrics
-        if 'qualtrics' in locals():
-            await qualtrics.cleanup()
+    #     # close qualtrics
+    #     if 'qualtrics' in locals():
+    #         await qualtrics.cleanup()
 
-        # close ngrok terminal
-        if 'ngrok' in locals():
-            await ngrok.cleanup()
+    #     # close ngrok terminal
+    #     if 'ngrok' in locals():
+    #         await ngrok.cleanup()
 
-        print("Cleanup complete")
+    #     print("Cleanup complete")
 
 
         # forcibly exits
