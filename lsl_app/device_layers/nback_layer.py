@@ -23,7 +23,7 @@ class NbackLayer:
     def send_sample(self, marker, is_practice):
 
         if is_practice:
-            return
+            marker = f"PRACTICE/{marker}"
         
         # convert to full list for correct sample format
         marker_codes = {
@@ -88,9 +88,11 @@ class NbackLayer:
             "2/STANDING/INSTRUCTION": 198,
             "0/WALKING/INSTRUCTION": 199,
             "1/WALKING/INSTRUCTION": 200,
-            "2/WALKING/INSTRUCTION": 201,       
+            "2/WALKING/INSTRUCTION": 201 
         }
-        
+
+        marker_codes = { (x if z == 0 else f"PRACTICE/{x}"): (v if z == 0 else v + 200) for x, v in marker_codes.items() for z in range(2) }
+
         self.outlet.push_sample([marker_codes[marker]])
 
 # if __name__ == "__main__":
