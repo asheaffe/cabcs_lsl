@@ -5,6 +5,7 @@ import websockets
 import aiofiles
 from rich import print
 import json
+import ast
 
 
 def create_lsl_outlet(name, channel_count, channel_names, sampling_rate):
@@ -43,16 +44,24 @@ async def receive_watch_data(socket):
     async for message in socket:
         if message == "EXECUTE_VIBRATION":                        
             await CLIENTS[1].send("EXECUTE_VIBRATION")
+        elif message == "movement":
+            continue
         else:
-            async with aiofiles.open("data.txt", "a") as f:
-                await f.write(f"{message}\n")
+            # async with aiofiles.open("data.txt", "a") as f:
+            #     await f.write(f"{message}\n")
             
-            try:
-                data = json.loads(message)                
-            except Exception as e:
-                print("[yellow]message not valid json. skipping.[/yellow]")
-                        
-            match data.get('name'):
+            # message = message.replace("\'", "\"\"")
+            # print(message)
+            data = json.loads(message)
+            # try:
+            # print(message)
+            # data = ast.literal_eval(message)
+            # except Exception as e:
+            #     print("[yellow]message not valid json. skipping.[/yellow]")
+            #     print(data)
+
+            # print(data)     
+            match data['name']:
                 case "HR":                    
                     hr_outlet.push_sample([data['hr'], data['hrStatus'], data['iBI']])
                 case "Accelerometer":

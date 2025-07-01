@@ -55,12 +55,12 @@ class NbackLayer:
             "2/STANDING/RESPONSE/A": 154,
             "2/STANDING/RESPONSE/B": 155,
             
-            "0/STANDING/RESPONSE/A": 156,
-            "0/STANDING/RESPONSE/B": 157,
-            "1/STANDING/RESPONSE/A": 158,
-            "1/STANDING/RESPONSE/B": 159,
-            "2/STANDING/RESPONSE/A": 160,
-            "2/STANDING/RESPONSE/B": 161,
+            "0/WALKING/RESPONSE/A": 156,
+            "0/WALKING/RESPONSE/B": 157,
+            "1/WALKING/RESPONSE/A": 158,
+            "1/WALKING/RESPONSE/B": 159,
+            "2/WALKING/RESPONSE/A": 160,
+            "2/WALKING/RESPONSE/B": 161,
             
             "0/STANDING/DRT_STIM": 170,
             "1/STANDING/DRT_STIM": 171,
