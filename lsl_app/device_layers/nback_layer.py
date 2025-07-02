@@ -23,7 +23,7 @@ class NbackLayer:
     def send_sample(self, marker, is_practice):
 
         if is_practice:
-            return
+            return 
         
         # convert to full list for correct sample format
         marker_codes = {
