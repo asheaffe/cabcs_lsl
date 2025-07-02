@@ -23,11 +23,7 @@ class NbackLayer:
     def send_sample(self, marker, is_practice):
 
         if is_practice:
-<<<<<<< HEAD
-            return 
-=======
             marker = f"PRACTICE/{marker}"
->>>>>>> b1580afd7ae7d19df6133fcf14051682894207b3
         
         # convert to full list for correct sample format
         marker_codes = {
