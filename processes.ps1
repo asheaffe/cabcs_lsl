@@ -37,7 +37,7 @@ try {
     # Start all processes and store them in the array
     Write-Host "Starting Python processes..."
     $processes += Start-Process python3.11 -ArgumentList "lsl_app/lsl_app.py" -PassThru
-    $processes += Start-Process python3.11 -ArgumentList "lsl_app/device_layers/etg_layer.py" -PassThru
+    # $processes += Start-Process python3.11 -ArgumentList "lsl_app/device_layers/etg_layer.py" -PassThru
     #$processes += Start-Process python3.11 -ArgumentList "nback_2025/nback_layer.py" -PassThru
     $processes += Start-Process python3.11 -ArgumentList "lsl_app/device_layers/watch_layer.py" -PassThru
     
