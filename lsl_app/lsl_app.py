@@ -138,9 +138,9 @@ def main():
     streams = pylsl.resolve_streams()
 
     # Create the pyqtgraph window
-    # pw = pg.plot(title="LSL Plot")
-    # plt = pw.getPlotItem()
-    # plt.enableAutoRange(x=False, y=True)
+    pw = pg.plot(title="LSL Plot")
+    plt = pw.getPlotItem()
+    plt.enableAutoRange(x=False, y=True)
 
     # iterate over found streams, creating specialized inlet objects that will
     # handle plotting the data
@@ -158,7 +158,7 @@ def main():
             and info.channel_format() != pylsl.cf_string
         ):
             print("Adding data inlet: " + info.name())
-            #inlets.append(DataInlet(info, plt))
+            inlets.append(DataInlet(info, plt))
         else:
             print("Don't know what to do with stream " + info.name())
 
@@ -168,7 +168,7 @@ def main():
         # so new data doesn't suddenly appear in the middle of the plot
         fudge_factor = pull_interval * 0.002
         plot_time = pylsl.local_clock()
-        #pw.setXRange(plot_time - plot_duration + fudge_factor, plot_time - fudge_factor)
+        pw.setXRange(plot_time - plot_duration + fudge_factor, plot_time - fudge_factor)
 
     def update():
         # Read data from the inlet. Use a timeout of 0.0 so we don't block GUI interaction.
@@ -189,11 +189,11 @@ def main():
     # pull_timer.timeout.connect(update)
     # pull_timer.start(pull_interval)
 
-    # import sys
+    import sys
 
-    # # Start Qt event loop unless running in interactive mode or using pyside.
-    # if (sys.flags.interactive != 1) or not hasattr(QtCore, "PYQT_VERSION"):
-    #     QtGui.QGuiApplication.instance().exec()
+    # Start Qt event loop unless running in interactive mode or using pyside.
+    if (sys.flags.interactive != 1) or not hasattr(QtCore, "PYQT_VERSION"):
+        QtGui.QGuiApplication.instance().exec()
 
 
 if __name__ == "__main__":
